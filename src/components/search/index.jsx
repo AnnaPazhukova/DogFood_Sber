@@ -1,12 +1,18 @@
 import './style.css';
-import { ReactComponent as  SearchIcon} from './img/ic-close-input.svg';
-import { ReactComponent as CloseIcon} from './img/ic-search.svg';
+import { ReactComponent as  SearchIcon} from './assets/ic-close-input.svg';
+import { ReactComponent as CloseIcon} from './assets/ic-search.svg';
 
-export function Search() {
+export function Search({handleFormSubmit,handleInputChange}) {
   return (
-    <form className='search'>
-      <input type="text" className="search__input" placeholder='Поиск'/>
-      <button className="search__button">
+    <form className='search' onSubmit={handleFormSubmit} >
+      <input 
+        type="text" 
+        className="search__input" 
+        onChange={(e) => {
+          handleInputChange(e.target.value)
+        }} 
+        placeholder='Поиск'/>
+      <button className="search__btn">
         <SearchIcon/>
         <CloseIcon/>
       </button>

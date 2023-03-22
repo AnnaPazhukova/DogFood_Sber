@@ -1,14 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './styles.css';
 import {App} from './components/app/index';
 
 
-
-
-
-// import logoImageSrc from './image/logo192.png';
 const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App/>);
 
 // const AppList = () => {
 //     const items = [
@@ -56,5 +53,5 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 //     );
 // }
 
-root.render(App);
+
 

@@ -1,33 +1,12 @@
 import {Card} from '../card/index.jsx';
 import './style.css';
 
-export function CardList() {
+export function CardList({goods}) {
   return (
   <>
-    <Card/>    
+    <div className="cards content__cards">
+      {goods.map((dataItem, index) => (<Card key={index} {...dataItem} />))} 
+    </div>    
   </>
   );
-  }
-
-
-
-
-
-
-
-
-
-
-//   import { dataCard } from "../../data";
-// import { Card } from "../card";
-// import "./styles.css";
-
-// export function CardList() {
-//   return (
-//     <div className="cards content__cards">
-//       {dataCard.map((dataItem) => (
-//         <Card {...dataItem} />
-//       ))}
-//     </div>
-//   );
-// }
+}
