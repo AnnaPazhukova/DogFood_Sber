@@ -194,7 +194,7 @@ export const postData = [
         "_id": "622bda7806c7d323b8ae461d",
         "title": "Restaurant",
         "author": {
-            "name": "Иван Иванов",
+            "name": "Иван Петров",
             "about": "Писатель",
             "avatar": "https://react-learning.ru/image-compressed/default-image.jpg",
             "_id": "622bd81b06c7d323b8ae4614",
