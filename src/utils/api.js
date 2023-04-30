@@ -21,6 +21,13 @@ class Api {
             .then(this.#onResponse)
     }
 
+    getProductById(idProduct){
+        return fetch(`${this.#baseurl}/products/${idProduct}`, {
+            headers: this.#headers
+            })
+                .then(this.#onResponse)
+    }
+
     getUserInfo(){
         return fetch(`${this.#baseurl}/users/me`, {
         headers: this.#headers
@@ -50,6 +57,10 @@ class Api {
         })
             .then(this.#onResponse)
     }
+
+    getInfoProduct(idProduct) {
+        return Promise.all([this.getProductById(idProduct), this.getUserInfo()])
+    } 
     
 }
 

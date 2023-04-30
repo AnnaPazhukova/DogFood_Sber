@@ -1,86 +1,100 @@
-import { useEffect, useState } from 'react';
-import {CardList} from '../card-list';
-import {Footer} from '../footer';
-import {Header} from '../header';
-// import { useState } from 'react';
-import { Sort } from '../sort';
-import s from './style.module.css';
-import {dataCard} from '../../data';
-import { Logo } from '../logo';
-import { Search } from '../search';
+import { useState, useEffect } from "react";
+import { CardList } from "../card-list";
+import { Footer } from "../footer";
+import { Header } from "../header";
+// import { Sort } from "../sort";
+import { Logo } from "../logo";
+import { Search } from "../search";
+import { dataCard } from "../../data";
+import s from "./styles.module.css";
 import { Button } from '../button';
+// import styled from 'styled-components';
 import api from '../../utils/api';
 import { useDebounce } from '../../hooks/useDebounce';
 import { isLiked } from '../../utils/products';
+import { CatalogPage } from '../../pages/catalog-page';
+import { ProductPage } from '../../pages/product-page';
+import FaqPage from '../../pages/faq-page';
 
 export function App() {
   const [cards, setCards] = useState([]);
-  const [currentUser,setCurrentUser] = useState(null)
-  const [searchQuery,setsearchQuery] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
+
   const debounceSearchQuery = useDebounce(searchQuery, 300);
 
   function handleRequest() {
-  
-  api.search(debounceSearchQuery)
-    .then((dataSearch) => {
-       setCards(dataSearch);
-    })
+    // const filterCards = dataCard.filter((item) =>
+    //   item.name.includes(searchQuery)
+    // );
+    // setCards(filterCards);
+
+    api.search(debounceSearchQuery)
+      .then((dataSearch) => {
+        setCards(dataSearch);
+        // console.log(data);
+      })
   }
 
-  function handleFormSubmit(e){
+  function handleFormSubmit(e) {
     e.preventDefault();
-    handleRequest()
+    handleRequest();
   }
-  
-  function handleInputChange(dataInput){
-    setsearchQuery(dataInput);
+
+  function handleInputChange(dataInput) {
+    setSearchQuery(dataInput);
   }
 
   function handleUpdateUser(dataUserUpdate) {
     api.setUserInfo(dataUserUpdate)
-    .then((updateUserFromServer) => {
-      setCurrentUser(updateUserFromServer)
-    })
+      .then((updateUserFromServer) => {
+        setCurrentUser(updateUserFromServer)
+      })
   }
 
   function handleProductLike(product) {
-    const like = isLiked(product.likes, currentUser._id);
+    const like = isLiked(product.likes, currentUser._id)
     api.changeLikeProductStatus(product._id, like)
-    .then((updateCard) => {
-      const newProducts = cards.map(cardState => {
-
-        return cardState._id === updateCard._id ? updateCard : cardState
+      .then((updateCard) => {
+        const newProducts = cards.map(cardState => {
+          return cardState._id === updateCard._id ? updateCard : cardState
+        })
+        setCards(newProducts)
       })
-      setCards(newProducts)
-    })
   }
 
   useEffect(() => {
     handleRequest();
-  }, [debounceSearchQuery])
+  }, [debounceSearchQuery]);
+
 
   useEffect(() => {
+    setIsLoading(true)
     api.getAllInfo()
-      .then(([productsData,  userInfoData]) => {
+      .then(([productsData, userInfoData]) => {
         setCurrentUser(userInfoData);
-        setCards(productsData.products)
+        setCards(productsData.products);
       })
-    .catch(err => console.log(err))
+      .catch(err => console.log(err))
+      .finally(() => { setIsLoading(false) })
   }, [])
+
   return (
     <>
       <Header user={currentUser} onUpdateUser={handleUpdateUser}>
-        <Logo/>
-        <Search 
-          handleFormSubmit={handleFormSubmit} 
+        <Logo />
+        <Search
+          handleFormSubmit={handleFormSubmit}
           handleInputChange={handleInputChange}
         />
       </Header>
-      <main className='content container'> 
-      <Sort/>
-      <CardList goods={cards} onProductLike={handleProductLike} currentUser={currentUser}/>
+      <main className="content container">
+        <FaqPage />
+        <ProductPage />
+        <CatalogPage cards={cards} handleProductLike={handleProductLike} currentUser={currentUser} isLoading={isLoading} />
       </main>
-      <Footer/>
+      <Footer />
     </>
   );
-  }
+}

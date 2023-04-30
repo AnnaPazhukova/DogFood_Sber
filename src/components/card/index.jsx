@@ -1,14 +1,13 @@
 import cn from 'classnames';
 import './style.css';
 import {ReactComponent as LikeIcon} from '../../image/save.svg';
-import { isLiked } from '../../utils/products';
+import { calcDiscountPrice, isLiked } from '../../utils/products';
 
 export function Card({name, price, discount, wigth,  pictures, tags, likes, onProductLike, _id,currentUser}){
-const discount_price = Math.round(price - (price*discount)/100);
-const like = isLiked(likes, currentUser._id);
+    const discount_price = calcDiscountPrice(price, discount);
+    const like = isLiked(likes, currentUser?._id);
 
   function handleClickButtonLike() {
-    console.log(likes);
     onProductLike({ likes, _id })
   }
   return (
