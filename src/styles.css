@@ -6,13 +6,21 @@
   margin: 0;
 }
 
+html,
+body{
+scrollbar-gutter: stable;
+}
+
 html {
   box-sizing: border-box;
+  height: 100%;
 }
 
 body {
   font-family: "Nunito", "Arial", "Helvetica", sans-serif;
+  height: 100%;
 }
+
 
 .container {
   /* max-width: 1024px; */

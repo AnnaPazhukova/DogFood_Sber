@@ -6,8 +6,10 @@ import {ReactComponent as LikeIcon} from '../../image/save.svg';
 import truck from "../../image/truck.svg";
 import quality from "../../image/quality.svg"; 
 import { Button } from '../button';
+import { useNavigate } from 'react-router-dom';
 
 function Product({onProductLike, _id, name, pictures, discount, description, price , likes =[], currentUser, reviews}) {
+    const navigate = useNavigate();
     const discount_price = calcDiscountPrice(price,discount);
     const like = isLiked(likes, currentUser?._id);
     function handleLikeClick() {
@@ -20,7 +22,7 @@ function Product({onProductLike, _id, name, pictures, discount, description, pri
     return (
         <>
             <div className={s.header}>
-                <a href="#" className='button-back'>Назад</a>
+                <a href="#" className='button-back' onClick={() => navigate(-1)}>Назад</a>
                 <h1 className={s.productTitle}>{name}</h1>
                 <p className={s.acticul}>Аартикул: <b>2388907</b></p>
             </div>

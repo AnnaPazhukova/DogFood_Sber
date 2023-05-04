@@ -15,12 +15,19 @@ import { isLiked } from '../../utils/products';
 import { CatalogPage } from '../../pages/catalog-page';
 import { ProductPage } from '../../pages/product-page';
 import FaqPage from '../../pages/faq-page';
+import { Route, Routes } from "react-router-dom";
+import { NotFound } from "../not-found";
+import { NotFoundPage } from "../../pages/not-found-page";
+import { UserContext } from "../contexts/current-user-context";
+import { CardsContext } from "../contexts/card-context";
+import { ThemeContext, themes } from "../contexts/theme-context";
 
 export function App() {
   const [cards, setCards] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [theme, setTheme] = useState(themes.light)
 
   const debounceSearchQuery = useDebounce(searchQuery, 300);
 
@@ -33,7 +40,6 @@ export function App() {
     api.search(debounceSearchQuery)
       .then((dataSearch) => {
         setCards(dataSearch);
-        // console.log(data);
       })
   }
 
@@ -55,12 +61,14 @@ export function App() {
 
   function handleProductLike(product) {
     const like = isLiked(product.likes, currentUser._id)
-    api.changeLikeProductStatus(product._id, like)
+    return api.changeLikeProductStatus(product._id, like)
       .then((updateCard) => {
         const newProducts = cards.map(cardState => {
           return cardState._id === updateCard._id ? updateCard : cardState
         })
-        setCards(newProducts)
+        setCards(newProducts);
+
+        return updateCard;
       })
   }
 
@@ -80,21 +88,41 @@ export function App() {
       .finally(() => { setIsLoading(false) })
   }, [])
 
+  function toggleTheme() {
+    theme === themes.dark ? setTheme(themes.light) : setTheme(themes.dark);
+  }
+
   return (
-    <>
-      <Header user={currentUser} onUpdateUser={handleUpdateUser}>
-        <Logo />
-        <Search
-          handleFormSubmit={handleFormSubmit}
-          handleInputChange={handleInputChange}
-        />
+    <ThemeContext.Provider value={{theme, toggleTheme}}>
+    <CardsContext.Provider value={{cards, handleLike: handleProductLike}}>
+    <UserContext.Provider value={{currentUser,  onUpdateUser:handleUpdateUser}}>
+    <Header user={currentUser}>
+        <Routes>
+        <Route path="/" element={ 
+        <>
+          <Logo />       
+          <Search
+            handleFormSubmit={handleFormSubmit}
+            handleInputChange={handleInputChange}
+          />
+        </>
+        }> 
+      </Route>
+      <Route path="*" element={<Logo href="/"/>}></Route>
+      </Routes>
       </Header>
-      <main className="content container">
-        <FaqPage />
-        <ProductPage />
-        <CatalogPage cards={cards} handleProductLike={handleProductLike} currentUser={currentUser} isLoading={isLoading} />
+
+      <main className="content container" style={{backgroundColor: theme.background }}>
+      <Routes>
+        <Route path="/" element={<CatalogPage isLoading={isLoading} />}></Route>
+        <Route path="/faq" element={<FaqPage />}></Route>
+        <Route path="/product/:productID" element={<ProductPage />}></Route>
+        <Route path="*" element={<NotFoundPage />}></Route>
+      </Routes>
       </main>
       <Footer />
-    </>
+    </UserContext.Provider>
+    </CardsContext.Provider>
+    </ThemeContext.Provider>
   );
 }
