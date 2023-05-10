@@ -1,14 +1,14 @@
+@import '~normalize.css';
 
 *,
 *::after,
 *::before {
   box-sizing: inherit;
-  margin: 0;
 }
 
 html,
-body{
-scrollbar-gutter: stable;
+body {
+  scrollbar-gutter: stable;
 }
 
 html {
@@ -21,13 +21,18 @@ body {
   height: 100%;
 }
 
-
 .container {
-  /* max-width: 1024px; */
+  max-width: 1024px;
   padding-left: 16px;
   padding-right: 16px;
   width: 95%;
   margin: 0 auto;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 img {
@@ -36,6 +41,7 @@ img {
 
 .content {
   padding: 20px 0;
+  flex: 1;
 }
 
 .content__sort {

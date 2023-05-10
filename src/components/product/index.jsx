@@ -7,8 +7,12 @@ import truck from "../../image/truck.svg";
 import quality from "../../image/quality.svg"; 
 import { Button } from '../button';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from '../../contexts/current-user-context';
+import { ContentHeader } from '../content-header';
 
-function Product({onProductLike, _id, name, pictures, discount, description, price , likes =[], currentUser, reviews}) {
+function Product({onProductLike, _id, name, pictures, discount, description, price , likes = [], reviews}) {
+    const {currentUser} = useContext(UserContext);
     const navigate = useNavigate();
     const discount_price = calcDiscountPrice(price,discount);
     const like = isLiked(likes, currentUser?._id);
@@ -21,11 +25,9 @@ function Product({onProductLike, _id, name, pictures, discount, description, pri
 
     return (
         <>
-            <div className={s.header}>
-                <a href="#" className='button-back' onClick={() => navigate(-1)}>Назад</a>
-                <h1 className={s.productTitle}>{name}</h1>
-                <p className={s.acticul}>Аартикул: <b>2388907</b></p>
-            </div>
+        <ContentHeader textButton='Назад' title={name}>
+            <p className={s.acticul}>Артикул:<b>2388907</b></p>
+        </ContentHeader>
             <div className={s.product}>
                 <div className={s.imgWrapper}>
                     <img src={pictures} alt={`Изображение ${name}`} />

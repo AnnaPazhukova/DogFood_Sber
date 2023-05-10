@@ -1,10 +1,9 @@
 import { useContext } from 'react';
 import {Card} from '../card/index.jsx';
 import './style.css';
-import { CardsContext } from '../contexts/card-context.js';
+import { CardsContext } from '../../contexts/card-context.js';
 
-export function CardList() {
-  const {cards:goods} = useContext(CardsContext);
+export function CardList({goods}) {
   return (
   <>
     <div className="cards content__cards">
