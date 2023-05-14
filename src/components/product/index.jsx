@@ -7,12 +7,14 @@ import truck from "../../image/truck.svg";
 import quality from "../../image/quality.svg"; 
 import { Button } from '../button';
 import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { UserContext } from '../../contexts/current-user-context';
 import { ContentHeader } from '../content-header';
+import Rating from '../raiting';
 
 function Product({onProductLike, _id, name, pictures, discount, description, price , likes = [], reviews}) {
     const {currentUser} = useContext(UserContext);
+    const [currentRating, setCurrentRating] = useState(4);
     const navigate = useNavigate();
     const discount_price = calcDiscountPrice(price,discount);
     const like = isLiked(likes, currentUser?._id);
@@ -26,6 +28,7 @@ function Product({onProductLike, _id, name, pictures, discount, description, pri
     return (
         <>
         <ContentHeader textButton='Назад' title={name}>
+            <Rating currentRating={currentRating}/>
             <p className={s.acticul}>Артикул:<b>2388907</b></p>
         </ContentHeader>
             <div className={s.product}>

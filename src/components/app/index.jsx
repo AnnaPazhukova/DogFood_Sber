@@ -8,7 +8,6 @@ import { Search } from "../search";
 import { dataCard } from "../../data";
 import s from "./styles.module.css";
 import { Button } from '../button';
-// import styled from 'styled-components';
 import api from '../../utils/api';
 import { useDebounce } from '../../hooks/useDebounce';
 import { isLiked } from '../../utils/products';
@@ -23,6 +22,8 @@ import { CardsContext } from "../../contexts/card-context";
 import { ThemeContext, themes } from "../../contexts/theme-context";
 import { FavouritesPage } from "../../pages/favourite-page";
 import { TABS_ID } from "../../utils/constants";
+import RegisterForm from "../form/register-form";import Modal from "../modal";
+;
 
 export function App() {
   const [cards, setCards] = useState([]);
@@ -32,15 +33,16 @@ export function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState(themes.light);
   const [currentSort, setCurrentSort] = useState('');
+  const [modalFormStatus, setModalFormStatus] = useState(true);
 
+  // const [contacts, setContacts] = useState([]);
   const debounceSearchQuery = useDebounce(searchQuery, 300);
 
-  function handleRequest() {
-    // const filterCards = dataCard.filter((item) =>
-    //   item.name.includes(searchQuery)
-    // );
-    // setCards(filterCards);
+  const onCloseModalForm = () => {
+    setModalFormStatus(false);
+  }
 
+  function handleRequest() {
     api.search(debounceSearchQuery)
       .then((dataSearch) => {
         setCards(dataSearch);
@@ -122,6 +124,9 @@ export function App() {
     <ThemeContext.Provider value={{theme, toggleTheme}}>
     <CardsContext.Provider value={{cards,favourites, handleLike: handleProductLike, isLoading, onSortData: sortedData, currentSort, setCurrentSort}}>
     <UserContext.Provider value={{currentUser,  onUpdateUser:handleUpdateUser}}>
+    <Modal isOpen={modalFormStatus} onClose={onCloseModalForm}>
+      <RegisterForm/>
+    </Modal>
     <Header user={currentUser}>
         <Routes>
         <Route path="/" element={ 
