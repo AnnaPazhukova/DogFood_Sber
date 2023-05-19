@@ -14,7 +14,7 @@ import { isLiked } from '../../utils/products';
 import { CatalogPage } from '../../pages/catalog-page';
 import { ProductPage } from '../../pages/product-page';
 import FaqPage from '../../pages/faq-page';
-import { Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { NotFound } from "../not-found";
 import { NotFoundPage } from "../../pages/not-found-page";
 import { UserContext } from "../../contexts/current-user-context";
@@ -22,8 +22,11 @@ import { CardsContext } from "../../contexts/card-context";
 import { ThemeContext, themes } from "../../contexts/theme-context";
 import { FavouritesPage } from "../../pages/favourite-page";
 import { TABS_ID } from "../../utils/constants";
-import RegisterForm from "../form/register-form";import Modal from "../modal";
-;
+import Modal from "../modal";
+import Register from "../register";
+import Login from "../login";
+import ResetPassword from "../reset-password";
+
 
 export function App() {
   const [cards, setCards] = useState([]);
@@ -34,12 +37,20 @@ export function App() {
   const [theme, setTheme] = useState(themes.light);
   const [currentSort, setCurrentSort] = useState('');
   const [modalFormStatus, setModalFormStatus] = useState(true);
+  const location = useLocation();
 
   // const [contacts, setContacts] = useState([]);
   const debounceSearchQuery = useDebounce(searchQuery, 300);
+  const backgroundLocation = location.state?.backgroundLocation;
+  const navigate = useNavigate();
+  const initialPath = location.state?.initialPath;
 
   const onCloseModalForm = () => {
     setModalFormStatus(false);
+  }
+
+  const onCloseRoutingModal = () => {
+    navigate(initialPath || '/', {replace: true})
   }
 
   function handleRequest() {
@@ -120,41 +131,102 @@ export function App() {
     theme === themes.dark ? setTheme(themes.light) : setTheme(themes.dark);
   }
 
-  return (
-    <ThemeContext.Provider value={{theme, toggleTheme}}>
-    <CardsContext.Provider value={{cards,favourites, handleLike: handleProductLike, isLoading, onSortData: sortedData, currentSort, setCurrentSort}}>
-    <UserContext.Provider value={{currentUser,  onUpdateUser:handleUpdateUser}}>
-    <Modal isOpen={modalFormStatus} onClose={onCloseModalForm}>
-      <RegisterForm/>
-    </Modal>
-    <Header user={currentUser}>
-        <Routes>
-        <Route path="/" element={ 
-        <>
-          <Logo />       
-          <Search
-            handleFormSubmit={handleFormSubmit}
-            handleInputChange={handleInputChange}
-          />
-        </>
-        }> 
-      </Route>
-      <Route path="*" element={<Logo href="/"/>}></Route>
-      </Routes>
-      </Header>
+  const cbSubmitFormLoginRegister = (dataForm) => {
+        console.log('cbSubmitForm', dataForm);
+  }
 
-      <main className="content container" style={{backgroundColor: theme.background }}>
-      <Routes>
-        <Route path="/" element={<CatalogPage isLoading={isLoading} />}></Route>
-        <Route path="/favourites" element={<FavouritesPage />}></Route>
-        <Route path="/faq" element={<FaqPage />}></Route>
-        <Route path="/product/:productID" element={<ProductPage />}></Route>
-        <Route path="*" element={<NotFoundPage />}></Route>
-      </Routes>
-      </main>
-      <Footer />
-    </UserContext.Provider>
-    </CardsContext.Provider>
-    </ThemeContext.Provider>
-  );
+  const cbSubmitFormResetPassword = (dataForm) => {
+    console.log('cbSubmitFormResetPassword', dataForm);
+}
+
+  const handleClickButtonReset = (e) => {
+    e.preventDefault();
+    navigate('/reset-password', {replace:true, state: {backgroundLocation: {...location, state: null}, initialPath}})
+  }
+  const handleClickButtonLogin = (e) => {
+    e.preventDefault();
+    navigate('/login', {replace:true, state: {backgroundLocation: {...location, state: null}, initialPath}})
+  }
+  const handleClickButtonRegister = (e) => {
+    e.preventDefault();
+    navigate('/register', {replace:true, state: {backgroundLocation: {...location, state: null}, initialPath}})
+  }
+
+
+  const handleClickButtonResetNotModal = (e) => {
+    e.preventDefault();
+    navigate('/reset-password')
+  }
+  const handleClickButtonLoginNotModal = (e) => {
+    e.preventDefault();
+    navigate('/login')
+  }
+  const handleClickButtonRegisterNotModal = (e) => {
+    e.preventDefault();
+    navigate('/register')
+  }
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <CardsContext.Provider value={{
+      cards,
+      favourites,
+      currentSort,
+      handleLike: handleProductLike,
+      isLoading,
+      onSortData: sortedData,
+      setCurrentSort
+    }}>
+      <UserContext.Provider value={{ currentUser, onUpdateUser: handleUpdateUser }}>
+        <Header user={currentUser}>
+          <Routes location={(backgroundLocation && { ...backgroundLocation, pathname: initialPath }) || location}>
+            <Route path='/' element={
+              <>
+                <Logo />
+                <Search
+                  handleFormSubmit={handleFormSubmit}
+                  handleInputChange={handleInputChange}
+                />
+              </>
+            } />
+            <Route path='*' element={<Logo href="/" />} />
+          </Routes>
+        </Header>
+        <main className="content container" style={{ backgroundColor: theme.background }}>
+          <Routes location={(backgroundLocation && { ...backgroundLocation, pathname: initialPath }) || location}>
+            <Route path='/' element={<CatalogPage handleProductLike={handleProductLike} currentUser={currentUser} isLoading={isLoading} />} />
+            <Route path='/favourites' element={<FavouritesPage />} />
+            <Route path='/faq' element={<FaqPage />} />
+            <Route path='/product/:productID' element={<ProductPage />} />
+            <Route path='/login' element={
+              <Login onSubmit={cbSubmitFormLoginRegister} onNavigateRegister={handleClickButtonRegisterNotModal} onNavigateReset={handleClickButtonResetNotModal}/>} />
+            <Route path='/register' element={
+                <Register onSubmit={cbSubmitFormLoginRegister} onNavigateLogin={handleClickButtonLoginNotModal}/> } />
+            <Route path="/reset-password" element={
+                <ResetPassword onSubmit={cbSubmitFormResetPassword}/>}/>
+            <Route path='*' element={<NotFoundPage />} />
+          </Routes>
+        </main>
+        <Footer />
+        {backgroundLocation && <Routes>
+          <Route path='/login' element={
+            <Modal isOpen onClose={onCloseRoutingModal}>
+              <Login onSubmit={cbSubmitFormLoginRegister} onNavigateRegister={handleClickButtonRegister} onNavigateReset={handleClickButtonReset}/>
+            </Modal>
+          } />
+          <Route path='/register' element={
+            <Modal isOpen onClose={onCloseRoutingModal}>
+              <Register onSubmit={cbSubmitFormLoginRegister} onNavigateLogin={handleClickButtonLogin}/>
+            </Modal>
+          } />
+          <Route path="/reset-password" element={
+            <Modal isOpen onClose={onCloseRoutingModal}>
+              <ResetPassword onSubmit={cbSubmitFormResetPassword}/>
+            </Modal>
+          }/>
+        </Routes>}
+      </UserContext.Provider>
+    </CardsContext.Provider >
+  </ThemeContext.Provider >
+);
 }

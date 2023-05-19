@@ -7,13 +7,15 @@ import { UserContext } from '../../contexts/current-user-context';
 import { ThemeContext } from '../../contexts/theme-context';
 import { CardsContext } from '../../contexts/card-context';
 import {ReactComponent as FavouriteIcon} from './img/favourites.svg';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export function Header({ children}) {
 
   const {currentUser, onUpdateUser} = useContext(UserContext);
   const {favourites} = useContext(CardsContext);
   const { toggleTheme } = useContext(ThemeContext);
+  const location = useLocation();
+
   const handleClickButtonEdit = () => {
     onUpdateUser({name: '', about : ''})
   }
@@ -27,15 +29,7 @@ export function Header({ children}) {
           {favourites.length !== 0 && <span className={s.iconBubble}>{favourites.length}</span>}
         </Link>
       </div>
-      {/* <Button action={handleClickButtonEdit}>
-        Изменить
-      </Button> */}
-      <label className="wraper" htmlFor="something">
-          <div className="switch-wrap">
-            <input type="checkbox" id="something" onChange={toggleTheme} />
-            <div className="switch"></div>
-          </div>
-        </label>
+        <Link to='/login' replace state={{backgroundLocation: location, initialPath: location.pathname}}> Войти</Link>
       </div>
     </header>
   );
